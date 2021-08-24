@@ -359,65 +359,6 @@ class Miner(Client):
 		self.__is_mining: bool = False
 		self.__mining_thread = threading.Thread(target=self.__mine, daemon=True)
 
-	def __construct_genesis(self):
-		self.construct_block(
-			proof=42,
-			previous_hash="Samira-mira-mira-e-e-Waka-Waka-e-e"
-		)
-
-	def construct_block(self, verified_transactions: List[Transactions.Transaction] = [],
-						proof=None, previous_hash=None) -> Blockchain.Block:
-		if proof is None or previous_hash is None:
-			last_block = self.blockchain.last_block
-			proof = Blockchain.proof_of_work(last_block.proof)
-			previous_hash = last_block.calculate_hash()
-
-		block = Blockchain.Block(
-			index=len(self.blockchain.blocks),
-			proof=proof,
-			verified_transactions=verified_transactions,
-			previous_block_hash=previous_hash)
-
-		coinbase_total = block.reward + sum([trans.transaction_fee for trans in verified_transactions])
-
-		# Coinbase Transaction
-		coinbase = Transactions.Transaction(
-			outputs=tuple([
-				Transactions.TransactionOutput(
-					self.identity,
-					coinbase_total
-				)]
-			)
-		)
-		coinbase.sign_transaction(self)
-		block.verified_transactions.insert(0, coinbase)
-		self.network.broadcast_block(block)	 # Broadcast block to available nodes
-
-		self.blockchain.blocks.append(block)
-
-		# -- Add Coinbase as new UTXO for Miner --
-		# utxo = Transactions.TransactionInput(
-		# 		block.index, 0, 0, coinbase_total
-		# 	)
-
-		# utxo.check_validity(self.identity, self.blockchain.blocks)
-		# self.my_UTXOs.add(utxo)  # Add UTXO
-
-		# ----------------------------------
-		# -- Add all Outputs as new UTXOS --
-		# ----------------------------------
-		self.blockchain.UTXOs.difference_update(block.extract_STXOs())
-		self.blockchain.UTXOs = set(self.blockchain.UTXOs.union(block.extract_UTXOs()))
-
-		# -- UPDATE MY UTXO SET --
-		my_utxos = set(block.find_UTXOs(self.identity))
-		for my_utxo in my_utxos:  # This will fail, but will cache the value
-			my_utxo.check_validity(sender=None, blockchain=self.blockchain)
-		self.my_UTXOs = self.my_UTXOs.union(my_utxos)
-		# ---------------------
-
-		return block
-
 	@property
 	def is_mining(self):
 		return self.__is_mining
@@ -434,21 +375,6 @@ class Miner(Client):
 		while self.__is_mining:
 			self.manual_mine()
 
-	def manual_mine(self):
-		"""
-		Mine --WITHOUT TRANSACTION LIMIT--
-		:return:
-		"""
-		if not self.verified_transactions:
-			return False
-
-		transactions: Dict[str, Transactions.Transaction] = self.verified_transactions
-		self.verified_transactions = dict()
-		new_block = self.construct_block(
-			verified_transactions=list(transactions.values()),
-		)
-		return new_block
-
 	def add_transaction(self, transaction) -> bool:
 		if not isinstance(transaction, Transactions.Transaction):
 			raise ValueError("Transaction is not a valid Transaction object!")
@@ -462,32 +388,3 @@ class Miner(Client):
 
 		self.verified_transactions[t_hash] = transaction
 		return True
-
-#
-# class KeyFactory:
-# 	"""
-# 	Manages creating, storing or loading UniCoin Clients.
-# 	"""
-#
-# 	@staticmethod
-# 	def create_key() -> RsaKey:
-# 		random = Crypto.Random.new().read
-# 		return RSA.generate(1024, random)
-#
-# 	@staticmethod
-# 	def store_key(key: RsaKey, friendly_name: str = None):
-# 		if not isinstance(key, RsaKey):
-# 			raise ValueError('First argument must be an RsaKey!')
-#
-# 		name = friendly_name if friendly_name else str(uuid.uuid4())
-# 		file_name = f'{paths.PATH_WALLETS}/{name}.der'
-# 		os.makedirs(os.path.dirname(file_name), exist_ok=True)
-# 		with open(file_name, 'wb+') as file:
-# 			file.write(key.exportKey(format='DER'))
-#
-# 	@staticmethod
-# 	def load_key(name: str) -> RsaKey:
-# 		with open(f'{paths.PATH_WALLETS}/{name}.der', 'rb') as file:
-# 			key = file.read()
-#
-# 		return RSA.import_key(key)

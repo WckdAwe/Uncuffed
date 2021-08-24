@@ -7,6 +7,7 @@ from .Block import Block
 from ..helpers.Storable import Storable
 from ..helpers.paths import PATH_DATA
 
+
 class Blockchain(Storable):
     """
     BlockChain

@@ -1,10 +1,8 @@
-import binascii
-
 import Uncuffed.transactions as Transactions
 import Uncuffed.chain as Chain
 from .Client import Client
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 from Crypto.PublicKey.RSA import RsaKey
 
 
@@ -16,17 +14,23 @@ class Miner(Client):
         # Store Verified transactions to input in block
         self.verified_transactions: Dict[str, Transactions.Transaction] = dict()
 
+    def _construct_genesis_block(self):
+        self.construct_block(
+            proof=42,
+            previous_hash="Samira-mira-mira-e-e-Waka-Waka-e-e"
+        )
+
     def construct_block(self,
                         verified_transactions: List[Transactions.Transaction] = None,
-                        proof=None) -> Chain.Block:
+                        proof=None,
+                        previous_hash=None) -> Chain.Block:
 
         if verified_transactions is None:
             verified_transactions = []
 
-        last_block: Chain.Block = self.blockchain.last_block
-        previous_hash = last_block.hash
-
-        if proof is None is None:
+        if proof is None and previous_hash is None:
+            last_block: Chain.Block = self.blockchain.last_block
+            previous_hash = last_block.hash
             proof = Chain.proof_of_work(last_block.proof)
 
         block = Chain.Block(
@@ -42,20 +46,21 @@ class Miner(Client):
             sender=self.identity,
             outputs=tuple([
                 Transactions.TransactionOutput(
-                    self.identity,
-                    coinbase_total
+                    recipient_address=self.identity,
+                    value=coinbase_total,
+                    message=None,
                 )]
             ),
         )
-
-        block.transactions.insert(0, coinbase)
         coinbase.sign_transaction(self.signer)
+        block.transactions.insert(0, coinbase)
 
-        # self.network.broadcast_block(block)  # Broadcast block to available nodes
+        # self.network.broadcast_block(block)  # TODO: Broadcast block to available nodes
 
         self.blockchain.blocks.append(block)
 
         # ----------------------------------
+        # TODO
         # -- Add all Outputs as new UTXOS --
         # ----------------------------------
         # self.blockchain.UTXOs.difference_update(block.extract_STXOs())
@@ -69,3 +74,18 @@ class Miner(Client):
         # ---------------------
 
         return block
+
+    def manual_mine(self) -> Optional[Chain.Block]:
+        """
+        Mine --WITHOUT TRANSACTION LIMIT--
+        :return:
+        """
+        if not self.verified_transactions:
+            return None
+
+        transactions: Dict[str, Transactions.Transaction] = self.verified_transactions
+        self.verified_transactions = dict()
+        new_block = self.construct_block(
+            verified_transactions=list(transactions.values()),
+        )
+        return new_block

@@ -1,9 +1,8 @@
 import collections
+
 from typing import List, Optional, TYPE_CHECKING
-
-# import Uncuffed.chain as Chain
-
 from Uncuffed import log
+
 from .TransactionOutput import TransactionOutput
 from ..helpers import Hashable
 
@@ -17,17 +16,17 @@ class TransactionInput(Hashable):
         self.transaction_index: int = transaction_index
         self.output_index: int = output_index
 
-        self.__balance = None  # Helper property to calculate 'cached' balance
+        self.__cached_balance = None  # Helper property to calculate 'cached' balance
 
     @property
     def cached_balance(self) -> Optional[int]:
-        return self.__balance
+        return self.__cached_balance
 
     def get_balance(self, blockchain: 'Blockchain') -> Optional[int]:
         try:
             output = self.find_transaction(blockchain=blockchain)
-            self.__balance = output.value
-            return self.__balance
+            self.__cached_balance = output.value
+            return self.__cached_balance
         except Exception as e:
             return None
 
@@ -59,7 +58,7 @@ class TransactionInput(Hashable):
             log.debug(f'[TRANSACTION INP - {self.hash}] Validation failed (NEGATIVE VALUE).')
             return False
 
-        self.__balance = output.value  # Cache the balance
+        self.__cached_balance = output.value  # Cache the balance
 
         if output.recipient_address != sender:
             log.debug(f'[TRANSACTION INP - {self.hash}] Validation failed (BAD-SENDER).')

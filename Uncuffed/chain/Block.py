@@ -95,7 +95,7 @@ class Block(Hashable):
         Total coins in circulation should be 1050
         :return:
         """
-        return max([0, 50 - 5 * ((self.index + 1) // 4)])
+        return max([0, 5000 - 5 * ((self.height + 1) // 4)])
 
     @classmethod
     def from_json(cls, data):

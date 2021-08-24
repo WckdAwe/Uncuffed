@@ -1,16 +1,16 @@
 import collections
-import json
 
+from typing import Optional
 from objsize import get_deep_size
 from ..helpers import Hashable
 from ..messages import AMessage
 
 
 class TransactionOutput(Hashable):
-    def __init__(self, recipient_address: str, value: int, message: AMessage):
+    def __init__(self, recipient_address: str, value: int, message: Optional[AMessage]):
         self.recipient_address: str = recipient_address
         self.value: int = value
-        self.message: AMessage = message
+        self.message: Optional[AMessage] = message
 
     def is_valid(self) -> bool:
         return self.value >= self.minimum_blabbers()
@@ -22,7 +22,7 @@ class TransactionOutput(Hashable):
         return collections.OrderedDict({
             'recipient_address': self.recipient_address,
             'value': self.value,
-            'message': self.message.to_dict(),
+            'message': self.message.to_dict() if self.message else None,
         })
 
     def __hash__(self):
@@ -32,7 +32,7 @@ class TransactionOutput(Hashable):
     def from_json(cls, data):
         recipient_address = str(data['recipient_address'])
         value = int(data['value'])
-        message = AMessage.from_json(data['message'])
+        message = AMessage.from_json(data['message']) if data['message'] else None
         return cls(
             recipient_address=recipient_address,
             value=value,

@@ -21,13 +21,13 @@ class Transaction(Hashable):
 
     def __init__(self,
                  sender: str,
-                 inputs: Tuple[TransactionInput],
-                 outputs: Tuple[TransactionOutput],
+                 inputs: Tuple[TransactionInput] = None,
+                 outputs: Tuple[TransactionOutput] = None,
                  signature: str = None,
                  timestamp: float = None):
         self.sender = sender
-        self.inputs: Tuple[TransactionInput] = inputs
-        self.outputs: Tuple[TransactionOutput] = outputs
+        self.inputs: Tuple[TransactionInput] = inputs or []
+        self.outputs: Tuple[TransactionOutput] = outputs or []
         self.timestamp: float = timestamp or time.time()
         self.signature: str = signature
 
