@@ -3,7 +3,7 @@ import time
 import Uncuffed.transactions as Transactions
 
 from Crypto.Hash import SHA256
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Tuple
 from Uncuffed import log
 
 from .Proofer import verify_proof
@@ -81,8 +81,54 @@ class Block(Hashable):
         if lite:
             return coinbase.balance_output >= self.reward
         else:
-            trans_fees = [trans.cached_transaction_fee for trans in self.transactions]
-            return trans_fees == coinbase.balance_output
+            trans_fees = sum([trans.cached_transaction_fee for trans in self.transactions])
+            coinbase_total = trans_fees + self.reward
+            return coinbase_total == coinbase.balance_output
+
+    def extract_UTXOs(self) -> set:
+        """
+        :return: All UTXOs generated in this block
+        """
+        resp = set()
+        for t_indx, transaction in enumerate(self.transactions):
+            outputs: Tuple[Transactions.TransactionOutput] = transaction.outputs
+            for o_indx, output in enumerate(outputs):
+                utxo: Transactions.TransactionInput = Transactions.TransactionInput(
+                    block_index=self.height,
+                    transaction_index=t_indx,
+                    output_index=o_indx
+                )
+                resp.add(utxo)
+        return resp
+
+    def extract_STXOs(self) -> set:
+        """
+        :return: All spent transactions from this block
+        """
+        resp = set()
+        for t_indx, transaction in enumerate(self.transactions):
+            inputs: Tuple[Transactions.TransactionInput] = transaction.inputs
+            for i_indx, inp in enumerate(inputs):
+                resp.add(inp)
+        return resp
+
+    def find_UTXOs(self, address: str) -> set:
+        """
+        :param address: Receiving address
+        :return: A set of all UTXOs the address received in this block
+        """
+        resp = set()
+        for t_indx, transaction in enumerate(self.transactions):
+            outputs: Tuple[Transactions.TransactionOutput] = transaction.outputs
+            for o_indx, output in enumerate(outputs):
+                if output.recipient_address == address:
+                    utxo: Transactions.TransactionInput = Transactions.TransactionInput(
+                        block_index=self.height,
+                        transaction_index=t_indx,
+                        output_index=o_indx
+                    )
+                    resp.add(utxo)
+        return resp
 
     @property
     def hash(self) -> str:

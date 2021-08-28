@@ -7,8 +7,9 @@ from ..helpers import JSONSerializable
 
 class EMessageType(int, Enum):
     UNDEFINED: int = 0
-    TEXT: int = 1
-    IMAGE: int = 2
+    PLAINTEXT: int = 1
+    ENCRYPTED_TEXT: int = 2
+    PLAIN_IMAGE: int = 3
 
 
 class AMessage(JSONSerializable, ABC):
@@ -26,7 +27,7 @@ class AMessage(JSONSerializable, ABC):
     @classmethod
     @abstractmethod
     def from_json(cls, data):
-        from .TextMessage import TextMessage
+        from .PlainTextMessage import TextMessage
 
         classes = [TextMessage]  # TODO: Insert this inside EnumMessage
         # TODO: Exception Handling

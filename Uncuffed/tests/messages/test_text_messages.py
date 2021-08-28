@@ -8,7 +8,7 @@ msg1 = Messages.TextMessage(message=__M)
 
 
 def test_type():
-    assert msg.message_type == Messages.EMessageType.TEXT
+    assert msg.message_type == Messages.EMessageType.PLAINTEXT
 
 
 def test_message():

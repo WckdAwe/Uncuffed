@@ -19,10 +19,14 @@ class ENodeType(int, Enum):
 class ANode(ABC):
 
     def __init__(self, private_key: RsaKey):
-        self.blockchain = Blockchain()
+        self.blockchain = Blockchain.load_from_file() or Blockchain()
         self.private_key: RsaKey = private_key
         self.public_key: RsaKey = self.private_key.publickey()
         self.processed_hashes: List[str] = []
+
+    @property
+    def node_type(self) -> int:
+        return ENodeType.UNDEFINED
 
     @property
     def identity(self) -> str:

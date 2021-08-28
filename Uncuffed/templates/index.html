@@ -1,0 +1,98 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-5">
+    <div class="col-md-5">
+        <div class="list-group">
+            <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                <i class="fas fa-id-badge fa-2x"></i>
+                <div class="d-flex gap-2 w-100 justify-content-between">
+                    <div>
+                        <h6 class="mb-0">CLIENT ID</h6>
+                        <p class="mb-0 opacity-50 small" style="overflow-wrap: anywhere;">{{ user.identity }}</p>
+                    </div>
+                </div>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                <div class="d-flex gap-2 w-100 justify-content-between">
+                    <div>
+                        <h6 class="mb-0">Blabbers</h6>
+                        {% for utxo in user.my_UTXOs %}
+                            <p class="mb-0 opacity-50"><i class="fab fa-connectdevelop"></i> {{utxo.cached_balance}} | UTXO ({{ utxo }})</p>
+                        {% else %}
+                            <p class="mb-0 opacity-75">Someone is poor (ಥ﹏ಥ)</p>
+                            <p class="mb-0 opacity-50">(UTXO list is empty!)</p>
+                        {% endfor %}
+                    </div>
+                    <span class="opacity-75 text-nowrap"><i class="fab fa-connectdevelop"></i> {{ user.balance }}</span>
+                </div>
+            </a>
+
+            {% if user.__class__.__name__ == 'Miner' %} {# Terrible way to do this... Anyways... IDK Jinja #}
+            <form class="list-group-item list-group-item-action d-grid" action="{{ url_for('index') }}" method="post">
+                {% if user.is_mining %}
+                    <input type="submit" class="btn btn-danger" name="toggle_mining" value="Stop Mining">
+                {%  else %}
+                    <input type="submit" class="btn btn-success" name="toggle_mining" value="Start Mining">
+                {% endif %}
+            </form>
+            {% endif %}
+<!--            </a>-->
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="list-group">
+            <div class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                <form class="w-100" action="{{ url_for('start_chat') }}" method="post">
+                    <label for="chat_id" class="form-label">Start chat with: </label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="chat_id" id="chat_id" placeholder="Public address of friend" value="" required="">
+                        <input type="submit" class="input-group-text btn btn-primary" value="Chat!"></input>
+                    </div>
+                </form>
+            </div>
+            <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                <div class="d-flex gap-2 w-100 justify-content-between">
+                    <div>
+                        <h6 class="mb-0">Another title here</h6>
+                    </div>
+                    <small class="opacity-50 text-nowrap">1s</small>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<!--	<center>-->
+<!--	<form action="/submit" id="textform" method="post">-->
+<!--	    <textarea name="content" rows="4" cols="50" placeholder="Just write whatever you want to..."></textarea>-->
+<!--	    <br>-->
+<!--	    <input type="text" name="author" placeholder="Your name">-->
+<!--	    <input type="submit" value="Post">-->
+<!--	</form>-->
+<!--	</center>-->
+
+<!--	<br>-->
+
+<!--	<a href="{{node_address}}/mine" target="_blank"><button>Request to mine</button></a>-->
+<!--	<a href="/"><button>Resync</button></a>-->
+
+<!--	<div style="margin: 20px;">-->
+
+<!--    {% for post in posts %}-->
+<!--    <div class="post_box">-->
+<!--	   <div class="post_box-header">-->
+<!--	      <div class="post_box-options"><button class="option-btn">Reply</button></div>-->
+<!--	      <div style="background: rgb(0, 97, 146) none repeat scroll 0% 0%; box-shadow: rgb(0, 97, 146) 0px 0px 0px 2px;" class="post_box-avatar">{{post.author[0]}}</div>-->
+<!--	      <div class="name-header">{{post.author}}</div>-->
+<!--	      <div class="post_box-subtitle"> Posted at <i>{{readable_time(post.timestamp)}}</i></div>-->
+<!--	   </div>-->
+<!--	   <div>-->
+<!--	      <div class="post_box-body">-->
+<!--	         <p>{{post.content}}</p>-->
+<!--	      </div>-->
+<!--	   </div>-->
+<!--	</div>-->
+<!--	{% endfor %}-->

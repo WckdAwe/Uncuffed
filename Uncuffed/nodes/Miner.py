@@ -1,7 +1,12 @@
+import threading
+
 import Uncuffed.transactions as Transactions
 import Uncuffed.chain as Chain
+from . import ENodeType
+
 from .Client import Client
 
+from Uncuffed import log
 from typing import Dict, List, Optional
 from Crypto.PublicKey.RSA import RsaKey
 
@@ -11,8 +16,20 @@ class Miner(Client):
     def __init__(self, private_key: RsaKey):
         super().__init__(private_key=private_key)
 
-        # Store Verified transactions to input in block
+        # Store Verified transactions to input in the next block
         self.verified_transactions: Dict[str, Transactions.Transaction] = dict()
+
+        # Settings
+        self.__is_mining: bool = False
+        self.__mining_thread = threading.Thread(target=self.__mine, daemon=True)
+
+        # Construct Genesis Block on empty Blockchain
+        if self.blockchain.size == 0:
+            self._construct_genesis_block()
+
+    @property
+    def node_type(self) -> int:
+        return ENodeType.MINER
 
     def _construct_genesis_block(self):
         self.construct_block(
@@ -60,20 +77,37 @@ class Miner(Client):
         self.blockchain.blocks.append(block)
 
         # ----------------------------------
-        # TODO
         # -- Add all Outputs as new UTXOS --
         # ----------------------------------
-        # self.blockchain.UTXOs.difference_update(block.extract_STXOs())
-        # self.blockchain.UTXOs = set(self.blockchain.UTXOs.union(block.extract_UTXOs()))
-        #
-        # # -- UPDATE MY UTXO SET --
-        # my_utxos = set(block.find_UTXOs(self.identity))
-        # for my_utxo in my_utxos:  # This will fail, but will cache the value
-        #     my_utxo.check_validity(sender=None, blockchain=self.blockchain)
-        # self.my_UTXOs = self.my_UTXOs.union(my_utxos)
+        self.blockchain.UTXOs.difference_update(block.extract_STXOs())
+        self.blockchain.UTXOs = set(self.blockchain.UTXOs.union(block.extract_UTXOs()))
+
+        # -- UPDATE MY UTXO SET --
+        my_utxos = set(block.find_UTXOs(self.identity))
+        for my_utxo in my_utxos:  # This will fail, but will cache the value
+            my_utxo.is_valid(sender=None, blockchain=self.blockchain)
+        self.my_UTXOs = self.my_UTXOs.union(my_utxos)
         # ---------------------
 
         return block
+
+    @property
+    def is_mining(self):
+        return self.__is_mining
+
+    def toggle_mining(self, mine: bool = None):
+        self.__is_mining = not self.__is_mining if mine is None else mine
+
+        if self.__is_mining:
+            log.info('Started mining...')
+            self.__mining_thread.start()
+        else:
+            log.info('Stopped mining...')
+            self.__mining_thread = threading.Thread(target=self.__mine, daemon=True)
+
+    def __mine(self):
+        while self.__is_mining:
+            self.manual_mine()
 
     def manual_mine(self) -> Optional[Chain.Block]:
         """
@@ -89,3 +123,18 @@ class Miner(Client):
             verified_transactions=list(transactions.values()),
         )
         return new_block
+
+    def add_transaction(self, transaction: Transactions.Transaction) -> bool:
+        if not isinstance(transaction, Transactions.Transaction):
+            raise ValueError('Transaction is not a valid Transaction object!')
+
+        t_hash = transaction.hash
+        if t_hash in self.verified_transactions.keys():
+            log.debug(f'[TRANSACTION - {t_hash}] Addition to list rejected (Already verified)')
+            return False
+
+        if not transaction.is_valid(blockchain=self.blockchain):  # TODO: , check_utxos=True):
+            return False
+
+        self.verified_transactions[t_hash] = transaction
+        return True

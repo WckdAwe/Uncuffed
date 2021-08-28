@@ -100,3 +100,6 @@ class TransactionInput(Hashable):
         return self.block_index == other.block_index and \
                self.transaction_index == other.transaction_index and \
                self.output_index == other.output_index
+
+    def __str__(self):
+        return f'({self.block_index}, {self.transaction_index}, {self.output_index})'

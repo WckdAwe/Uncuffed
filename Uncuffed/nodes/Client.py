@@ -16,8 +16,14 @@ class Client(ANode):
         self.my_UTXOs: Set[Transactions.TransactionInput] = set()  # List of unspent transactions
 
     @property
+    def node_type(self) -> int:
+        return ENodeType.CLIENT
+
+    @property
     def balance(self):
-        pass    # TODO
+        return sum(
+            filter(lambda o: o > 0, [utxo.cached_balance for utxo in self.my_UTXOs])
+        )
 
     def send_message(self):
         pass    # TODO
