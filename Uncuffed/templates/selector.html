@@ -1,0 +1,25 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="px-4 my-5 text-center">
+    <h1 class="display-5 fw-bold">It's time for you to choose!</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">
+            You want to join the revolution and be a <strong>Miner</strong> or
+            just a plebeian <strong>client</strong>?
+        </p>
+        <form class="list-group" action="" method="POST">
+            <div class="btn-group d-grid d-sm-flex justify-content-sm-center" role="group">
+                <input type="radio" class="btn-check" name="node_type" id="node_miner" value="node_miner" checked>
+                <label class="btn btn-outline-primary" for="node_miner">I want to be a <strong>Miner</strong></label>
+                <input type="radio" class="btn-check" name="node_type" id="node_client" value="node_client">
+                <label class="btn btn-outline-primary" for="node_client">Plebeian <strong>Client</strong> for me</label>
+            </div>
+
+            <input type="submit" class="m-5 input-group-text btn btn-success" value="Lets go do (illegal) stuff!">
+        </form>
+    </div>
+</div>
+
+{% endblock %}

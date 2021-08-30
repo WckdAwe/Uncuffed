@@ -32,6 +32,14 @@ class Block(Hashable):
         self.previous_block_hash: str = previous_block_hash
         self.timestamp: float = timestamp or time.time()
 
+    def clean_transactions(self):
+        """
+        USED ONLY FOR LITE CLIENTS.
+        Clean transactions in order to save space in lite clients.
+        :return:
+        """
+        self.transactions = []
+
     def is_valid(self, prev_block,
                  blockchain: 'Blockchain',
                  lite: bool = False) -> bool:
@@ -128,6 +136,21 @@ class Block(Hashable):
                         output_index=o_indx
                     )
                     resp.add(utxo)
+        return resp
+
+    def find_STXOs(self, address: str) -> set:
+        """
+        :param address: Receiving address
+        :return: A set of all STXOs the address received in this block
+        """
+        resp = set()
+        for t_indx, transaction in enumerate(self.transactions):
+            if transaction.sender != address:
+                continue
+
+            inputs: Tuple[Transactions.TransactionInput] = transaction.inputs
+            for i_indx, inp in enumerate(inputs):
+                resp.add(inp)
         return resp
 
     @property

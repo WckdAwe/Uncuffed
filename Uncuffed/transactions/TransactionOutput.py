@@ -16,7 +16,11 @@ class TransactionOutput(Hashable):
         return self.value >= self.minimum_blabbers()
 
     def minimum_blabbers(self) -> int:
-        return max(1, int(get_deep_size(self.message) >> 6))     # Maximum between 1 and (message size in bits) / 64
+        return self.calculate_minimum_blabbers(self.message)
+
+    @staticmethod
+    def calculate_minimum_blabbers(message: AMessage) -> int:
+        return max(1, int(get_deep_size(message) >> 6))       # Maximum between 1 and (message size in bits) / 64
 
     def to_dict(self):
         return collections.OrderedDict({

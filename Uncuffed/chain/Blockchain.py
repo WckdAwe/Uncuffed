@@ -60,20 +60,20 @@ class Blockchain(Storable):
             if old_block.hash != new_block.hash:
                 diff.append(old_block.height)
 
-        if len(diff) == 0:
-            raise Exception("Difference is 0?? How?")
         return diff
 
     @classmethod
     def from_json(cls, data):
         blocks = list(map(Block.from_json, data['blocks']))
-
+        utxos = set(map(Transactions.TransactionInput.from_json, data['utxos']))
         return cls(
             blocks=blocks,
+            utxos=utxos,
         )
 
     def to_dict(self) -> dict:
         return collections.OrderedDict({
             'length': self.size,
             'blocks': tuple(map(lambda o: o.to_dict(), self.blocks)),
+            'utxos': tuple(map(lambda o: o.to_dict(), self.UTXOs)),
         })

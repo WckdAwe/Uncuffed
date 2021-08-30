@@ -2,6 +2,9 @@ import threading
 
 import Uncuffed.transactions as Transactions
 import Uncuffed.chain as Chain
+import Uncuffed.messages as Messages
+import Uncuffed.network as Network
+
 from . import ENodeType
 
 from .Client import Client
@@ -72,7 +75,7 @@ class Miner(Client):
         coinbase.sign_transaction(self.signer)
         block.transactions.insert(0, coinbase)
 
-        # self.network.broadcast_block(block)  # TODO: Broadcast block to available nodes
+        Network.NetworkHandler.get_instance().broadcast_block(block)
 
         self.blockchain.blocks.append(block)
 
@@ -84,8 +87,9 @@ class Miner(Client):
 
         # -- UPDATE MY UTXO SET --
         my_utxos = set(block.find_UTXOs(self.identity))
-        for my_utxo in my_utxos:  # This will fail, but will cache the value
-            my_utxo.is_valid(sender=None, blockchain=self.blockchain)
+        for my_utxo in my_utxos:
+            my_utxo.get_balance(blockchain=self.blockchain)
+            # my_utxo.is_valid(sender=None, blockchain=self.blockchain)
         self.my_UTXOs = self.my_UTXOs.union(my_utxos)
         # ---------------------
 
@@ -138,3 +142,16 @@ class Miner(Client):
 
         self.verified_transactions[t_hash] = transaction
         return True
+
+    def send_message(self, address: str, total_gas: int, message: Messages.AMessage) -> \
+            Optional[Transactions.Transaction]:
+        t = super().send_message(
+            address=address,
+            total_gas=total_gas,
+            message=message,
+        )
+        
+        if t:
+            self.add_transaction(t)
+
+        return t

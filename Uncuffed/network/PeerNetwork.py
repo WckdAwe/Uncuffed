@@ -1,5 +1,5 @@
 import collections
-import concurrent
+import concurrent.futures
 import json
 import requests as requests
 
@@ -41,7 +41,8 @@ class PeerNetwork(Storable):
 
         if exclude_peer is not None:
             peer_set.remove(exclude_peer)
-        return set(self._peers)
+
+        return peer_set
 
     def register_peer(self, peer: Peer):
         """
@@ -94,8 +95,7 @@ class PeerNetwork(Storable):
         :param data: json data to pass.
         :return: Tuple containing successfully sent and total peers.
         """
-        peers = self.get_peers
-        peers.remove(caller)
+        peers = self.get_peers(exclude_peer=caller)
         total_peers = len(peers)
 
         with concurrent.futures.ThreadPoolExecutor() as executor:

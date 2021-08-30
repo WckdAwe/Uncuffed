@@ -24,3 +24,10 @@ API_NODES = f'{API}/nodes'
 API_NODES_LIST = f'{API_NODES}/list'
 API_NODES_INFO = f'{API_NODES}/info'
 API_NODES_REGISTER = f'{API_NODES}/register'
+
+
+# ------ [ WEB ] ------
+WEB_HOME = '/'
+WEB_SELECTOR = '/selector'
+WEB_CHAT = '/chat'
+WEB_CHAT_WITH_ADDRESS = f'{WEB_CHAT}/<address>'

@@ -12,8 +12,8 @@ import Uncuffed.chain as Chain
 from Uncuffed import log
 from .PeerNetwork import PeerNetwork
 from .Peer import Peer
-from ..web.routes import API_BROADCASTS_NEW_TRANSACTION, API_BROADCASTS_NEW_BLOCK, API_BLOCKCHAIN_LENGTH, \
-    API_BLOCKCHAIN_BLOCKS
+
+import Uncuffed.web.routes
 
 
 class NetworkHandler:
@@ -26,7 +26,7 @@ class NetworkHandler:
             NetworkHandler.__instance = self
 
         self.my_peer = my_peer
-        self.network: PeerNetwork = PeerNetwork().get_instance()
+        self.network: PeerNetwork = PeerNetwork.get_instance()
         self.__transactions_queue = queue.Queue()
         self.__blocks_queue = queue.Queue()
 
@@ -76,12 +76,13 @@ class NetworkHandler:
                 data = transaction.to_json().decode('utf-8')
 
                 log.debug(f'[TRANSACTION - {t_hash}] Broadcasting Transaction')
+
                 if data is None:
                     log.warn(f'[TRANSACTION - {t_hash}] Broadcasting Transaction failed. Bad JSON')
 
                 total_sent, total_peers = self.network.broadcast_json(
                     caller=self.my_peer,
-                    route=API_BROADCASTS_NEW_TRANSACTION,
+                    route=Uncuffed.web.routes.API_BROADCASTS_NEW_TRANSACTION,
                     data=data
                 )
 
@@ -97,22 +98,20 @@ class NetworkHandler:
         while True:
             if not q.empty():
                 block: Chain.Block = q.get(timeout=1)
-                b_hash = block.hash
-                log.debug(f'[BLOCK - {b_hash}] Broadcasting Block')
+                log.debug(f'[BLOCK - {block.height}] Broadcasting Block')
                 data = block.to_json().decode('utf-8')
                 if data is None:
-                    log.warn(f'[BLOCK - {b_hash}] Broadcasting Block failed. Bad JSON')
+                    log.warn(f'[BLOCK - {block.height}] Broadcasting Block failed. Bad JSON')
                 total_sent, total_peers = self.network.broadcast_json(
                     caller=self.my_peer,
-                    route=API_BROADCASTS_NEW_BLOCK,
+                    route=Uncuffed.web.routes.API_BROADCASTS_NEW_BLOCK,
                     data=data
                 )
 
-                log.debug(f'[BLOCK - {b_hash}] Broadcast ended. {total_sent}/{total_peers} peers received the message')
+                log.debug(f'[BLOCK - {block.height}] Broadcast ended. {total_sent}/{total_peers} peers received the message')
             time.sleep(1)
 
     def check_peer_chains(self, my_length: int):
-
         max_length = my_length
         max_chain = None
 
@@ -135,7 +134,7 @@ class NetworkHandler:
         :return: Length of peer's blockchain.
         """
         try:
-            response = requests.get(f'{peer.get_url()}{API_BLOCKCHAIN_LENGTH}')
+            response = requests.get(f'{peer.get_url()}{Uncuffed.web.routes.API_BLOCKCHAIN_LENGTH}')
 
             if response.status_code == 200:
                 json_data = json.loads(response.text)
@@ -152,7 +151,7 @@ class NetworkHandler:
         :param peer:
         :return:
         """
-        response = requests.get(f'{peer.get_url()}{API_BLOCKCHAIN_BLOCKS}')
+        response = requests.get(f'{peer.get_url()}{Uncuffed.web.routes.API_BLOCKCHAIN}')
 
         if response.status_code == 200:
             try:

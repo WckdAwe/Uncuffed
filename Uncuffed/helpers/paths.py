@@ -1,4 +1,5 @@
 PATH_DATA = 'data'
-PATH_WALLETS = f'{PATH_DATA}/wallets'
 
 FILE_NODELIST = f'{PATH_DATA}/node_list.json'
+FILE_BLOCKCHAIN = f'{PATH_DATA}/blockchain.json'
+FILE_WALLET = f'{PATH_DATA}/wallet.der'

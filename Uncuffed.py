@@ -1,51 +1,56 @@
-import threading
 import time
-
 import Uncuffed as Unc
 import Uncuffed.nodes as Nodes
+import Uncuffed.network as Network
 import logging
 
-
-# import Uncuffed.chain as Chain
-# import Uncuffed.transactions as Transactions
-# import Uncuffed.messages as Messages
-# import Uncuffed.network as Network
 
 logging.getLogger().setLevel(logging.DEBUG)
 
 
 def tst_run(port=5000):
-	import Uncuffed as Uncuffed
-	Uncuffed.my_node = Nodes.Miner(Nodes.KeyFactory.create_key())
+	# Unc.my_node = Nodes.Miner(Nodes.KeyFactory.create_key())
+	# Unc.my_node = Nodes.Miner(Nodes.KeyFactory.create_key())
+	Network.PeerNetwork.load_from_file()
+	Network.NetworkHandler.get_instance(
+		my_peer=Network.Peer(
+			address='127.0.0.1',
+			port=port
+		)
+	)
+	time.sleep(1)
 
-	import Uncuffed.web
+	import Uncuffed.web.views
+	import Uncuffed.web.api
 	Uncuffed.app.run(port=port)
 
 
-def run(port=5000):
-	# key = menus.menu_select_key()
-	# my_node = menus.menu_select_client_type(key, my_peer=Nodes.Peer("127.0.0.1", port))
-	Unc.my_node = Nodes.Miner(Nodes.KeyFactory.create_key())
-
-	# -- START WEB SERVER --
-	print('Good to go... Starting web server...')
-	import Uncuffed.web
-	w = threading.Thread(target=Unc.app.run, args=(None, port,), daemon=True)
-	w.start()
-	# ----------------------
-
-	time.sleep(1)
-	while True:
-		time.sleep(5)
-# 	# -- START MENU --
+# def run(port=5000):
+# 	# key = menus.menu_select_key()
+# 	# my_node = menus.menu_select_client_type(key, my_peer=Nodes.Peer("127.0.0.1", port))
+# 	Unc.my_node = Nodes.Miner(Nodes.KeyFactory.create_key())
+#
+# 	# -- START WEB SERVER --
+# 	print('Good to go... Starting web server...')
+# 	import Uncuffed.web
+# 	w = threading.Thread(target=Unc.app.run, args=(None, port,), daemon=True)
+# 	w.start()
+# 	# ----------------------
+#
 # 	time.sleep(1)
 # 	while True:
-# 		menus.menu_main(my_node)
-#
+# 		time.sleep(5)
+# # 	# -- START MENU --
+# # 	time.sleep(1)
+# # 	while True:
+# # 		menus.menu_main(my_node)
+# #
 
 
 if __name__ == '__main__':
-	tst_run(5000)
+	port = int(input('[Uncuffed] Please provide port number: '))
+	# port = 5000
+	tst_run(port)
 	# key = Nodes.KeyFactory.load_key('WICKED')
 	# miner = Nodes.Miner(private_key=key)
 	# print('Miner priv\t\t: ', miner.private_key)

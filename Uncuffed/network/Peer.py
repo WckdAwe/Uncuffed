@@ -19,7 +19,7 @@ class Peer:
         addr, port = address.split(':', 1)
         return cls(
             address=addr,
-            port=port,
+            port=int(port),
         )
 
     def get_url(self, use_https=False) -> str:
@@ -33,7 +33,5 @@ class Peer:
         return hash((self.address, self.port))
 
     def __eq__(self, other):
-        if not isinstance(other, Peer):
-            return NotImplemented
-
         return self.address == other.address and self.port == other.port
+
