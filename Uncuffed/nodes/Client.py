@@ -6,6 +6,7 @@ import os
 import Uncuffed.transactions as Transactions
 import Uncuffed.messages as Messages
 import Uncuffed.network as Network
+import Uncuffed.chats as Chats
 
 from .ANode import ANode, ENodeType
 
@@ -25,8 +26,10 @@ class Client(ANode):
         self.signer: PKCS115_SigScheme = pkcs1_15.new(self.private_key)
         self.my_UTXOs: Set[Transactions.TransactionInput] = set()
         self.my_STXOs: Set[Transactions.TransactionInput] = set()
+        self.tmp_msgs: Set[Chats.MessageInstance] = set()
 
-        self.my_UTXOs, self.my_STXOs = self.load_transactions()
+        self.my_UTXOs, self.my_STXOs, self.tmp_msgs = self.load_node()
+
         self.refresh_balance()
 
     @property
@@ -128,9 +131,10 @@ class Client(ANode):
             timestamp=transaction.timestamp,
         )
         msg_instance.init_message()
-        chat.messages.append(msg_instance)
+        chat.messages.add(msg_instance)
         chat.store_to_file()
         return chat, msg_instance
+
     """
     THESE FILE OPS Should be extracted to a different UTXO Class
     """
@@ -144,20 +148,22 @@ class Client(ANode):
         with open(file_name, 'w+') as file:
             file.write(json.dumps(self.to_dict()))
 
-    def load_transactions(self):
+    def load_node(self):
         try:
             with open(self.get_storage_location(), 'r') as file:
                 json_contents = json.loads(file.read())
                 my_UTXOs = set(map(Transactions.TransactionInput.from_json, json_contents['my_UTXOs']))
                 my_STXOs = set(map(Transactions.TransactionInput.from_json, json_contents['my_STXOs']))
-                return my_UTXOs, my_STXOs
+                tmp_msgs = set(map(Chats.MessageInstance.from_json, json_contents['tmp_msgs']))
+                return my_UTXOs, my_STXOs, tmp_msgs
         except Exception as e:
             log.error(e)
             self.store_transactions()
-            return set(), set()
+            return set(), set(), set()
 
     def to_dict(self) -> dict:
         return collections.OrderedDict({
             'my_UTXOs': tuple(map(lambda o: o.to_dict(), self.my_UTXOs)),
             'my_STXOs': tuple(map(lambda o: o.to_dict(), self.my_STXOs)),
+            'tmp_msgs': tuple(map(lambda o: o.to_dict(), self.tmp_msgs))
         })

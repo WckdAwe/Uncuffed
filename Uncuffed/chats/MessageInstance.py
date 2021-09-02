@@ -38,6 +38,9 @@ class MessageInstance(JSONSerializable):
         # if self.sender == node.identity:    # Decrypt my Message
         #     pass
 
+    def __hash__(self):
+        return hash((self.sender, self.inp, self.value, self.message, self.timestamp))
+
     def __eq__(self, other):
         return self.sender == other.sender and \
                self.inp == other.inp and \

@@ -3,7 +3,7 @@ import collections
 from .AMessage import AMessage, EMessageType
 
 
-class TextMessage(AMessage):
+class PlainTextMessage(AMessage):
 
     def __init__(self, message: str):
         self.message: str = message
@@ -27,3 +27,6 @@ class TextMessage(AMessage):
 
     def __eq__(self, other):
         return self.message == other.message
+
+    def __hash__(self):
+        return hash((self.message_type, self.message))

@@ -103,7 +103,7 @@ class Miner(Client):
         # -- UPDATE MY CHAT --
         # -- Yes, it should be implemented a different way... but it is just a demo --
         # -- We are repeating unnecessary calculations
-        block.update_chat(self.identity)
+        block.update_chat(self)
         return block
 
     @property

@@ -11,6 +11,7 @@ from ..helpers import Hashable
 
 if TYPE_CHECKING:
     from Uncuffed.chain.Blockchain import Blockchain
+    import Uncuffed.nodes as Nodes
 
 
 class Block(Hashable):
@@ -161,40 +162,64 @@ class Block(Hashable):
                 resp.add(inp)
         return resp
 
-    def update_chat(self, address: str):
+    def update_chat(self, node: 'Nodes.Client'):
         """
-        :param address: Receiving address
+        :param node: receiving node
         :return:
         """
         from Uncuffed.chats.Chat import Chat, get_all_chats
         from Uncuffed.chats.MessageInstance import MessageInstance
         chats = get_all_chats()
+        address: str = node.identity
 
         for t_indx, transaction in enumerate(self.transactions):
             outputs: Tuple[Transactions.TransactionOutput] = transaction.outputs
-            if transaction.sender == address:
-                continue
+            # if transaction.sender == address:
+            #     continue
 
             for o_indx, output in enumerate(outputs):
-                if output.recipient_address == address:
-                    utxo: Transactions.TransactionInput = Transactions.TransactionInput(
-                        block_index=self.height,
-                        transaction_index=t_indx,
-                        output_index=o_indx
+                if transaction.sender != address and output.recipient_address != address:
+                    continue
+
+                if transaction.sender == address and output.recipient_address == address:
+                    continue
+
+                utxo: Transactions.TransactionInput = Transactions.TransactionInput(
+                    block_index=self.height,
+                    transaction_index=t_indx,
+                    output_index=o_indx
+                )
+
+                if transaction.sender == address:
+                    chat = chats[output.recipient_address] if output.recipient_address in chats.keys() else Chat.load_from_file(
+                        friendly_name=output.recipient_address,
                     )
+                elif output.recipient_address == address:
                     chat = chats[transaction.sender] if transaction.sender in chats.keys() else Chat.load_from_file(
                         friendly_name=transaction.sender,
                     )
-                    msg_instance = MessageInstance(
-                        sender=transaction.sender,
-                        inp=utxo,
-                        message=output.message,
-                        value=output.value,
-                        timestamp=transaction.timestamp,
-                    )
-                    msg_instance.init_message()
-                    chat.messages.append(msg_instance)
-                    chat.store_to_file()
+                else:
+                    log.error('Unexpected output on UPDATE_CHAT')
+                    continue
+
+                msg_instance = MessageInstance(
+                    sender=transaction.sender,
+                    inp=None,
+                    message=output.message,
+                    value=output.value,
+                    timestamp=transaction.timestamp,
+                )
+
+                if msg_instance in chat.messages:
+                    chat.messages.remove(msg_instance)
+                else:
+                    log.warn('Nop')
+
+                msg_instance.inp = utxo
+
+                msg_instance.init_message()
+                chat.messages.add(msg_instance)
+                chat.store_to_file()
 
     @property
     def hash(self) -> str:

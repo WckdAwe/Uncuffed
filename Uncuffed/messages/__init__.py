@@ -1,2 +1,2 @@
 from .AMessage import AMessage, EMessageType
-from .PlainTextMessage import TextMessage
+from .PlainTextMessage import PlainTextMessage

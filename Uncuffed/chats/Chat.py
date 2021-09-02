@@ -2,7 +2,7 @@ import collections
 import os
 import uuid
 
-from typing import List, Dict
+from typing import List, Dict, Set
 
 from Uncuffed import log
 from Uncuffed.helpers.Storable import Storable
@@ -13,9 +13,9 @@ from .MessageInstance import MessageInstance
 
 class Chat(Storable):
 
-    def __init__(self, other_address: str, messages: List[MessageInstance], friendly_name: str = None):
+    def __init__(self, other_address: str, messages: Set[MessageInstance], friendly_name: str = None):
         self.other_address = other_address
-        self.messages: List[MessageInstance] = messages
+        self.messages: Set[MessageInstance] = messages
 
         if not friendly_name:
             self.friendly_name = str(uuid.uuid4())
@@ -52,7 +52,7 @@ class Chat(Storable):
             log.info(f'Creating chat log for {friendly_name}')
             class_ = cls(
                 other_address=address,
-                messages=list(),
+                messages=set(),
             )
             class_.store_to_file()
 
@@ -62,7 +62,7 @@ class Chat(Storable):
     def from_json(cls, data):
         other_address = str(data['other_address'])
         friendly_name = str(data['friendly_name'])
-        messages = list(map(MessageInstance.from_json, data['messages']))
+        messages = set(map(MessageInstance.from_json, data['messages']))
         return cls(
             other_address=other_address,
             friendly_name=friendly_name,

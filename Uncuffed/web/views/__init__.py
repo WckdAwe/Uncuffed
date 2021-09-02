@@ -66,7 +66,7 @@ def chat(address: str):
 	if request.method == 'POST':
 		my_node.send_message(
 			address=address,
-			message=Messages.TextMessage(
+			message=Messages.PlainTextMessage(
 				message=request.form.get('text_message') or None
 			),
 			total_gas=int(request.form.get('blabber_gas')) or 0

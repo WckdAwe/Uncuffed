@@ -62,7 +62,7 @@ def broadcasts_new_block():
 		# -- UPDATE MY CHAT --
 		# -- Yes, it should be implemented a different way... but it is just a demo --
 		# -- We are repeating unnecessary calculations
-		block.update_chat(my_node.identity)
+		block.update_chat(my_node)
 		# ---------------------
 
 		# -- REMOVE (NOW) INVALID TRANSACTIONS --
@@ -128,7 +128,7 @@ def broadcasts_new_block():
 					# -- UPDATE MY CHAT --
 					# -- Yes, it should be implemented a different way... but it is just a demo --
 					# -- We are repeating unnecessary calculations
-					block.update_chat(my_node.identity)
+					block.update_chat(my_node)
 				# ---------------------
 
 				my_node.blockchain = chain

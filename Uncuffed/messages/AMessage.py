@@ -25,9 +25,12 @@ class AMessage(JSONSerializable, ABC):
 
     @classmethod
     def from_json(cls, data):
-        from .PlainTextMessage import TextMessage
+        from .PlainTextMessage import PlainTextMessage
 
-        classes = [TextMessage]  # TODO: Insert this inside EnumMessage
+        classes = [PlainTextMessage]  # TODO: Insert this inside EnumMessage
         # TODO: Exception Handling
         msg_type = int(data['type'])
         return classes[msg_type - 1].from_json(data)
+
+    def __hash__(self):
+        return hash((self.message_type, ))
