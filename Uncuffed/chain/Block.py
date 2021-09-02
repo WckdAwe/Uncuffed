@@ -35,7 +35,7 @@ class Block(Hashable):
         self.timestamp: float = timestamp or time.time()
 
         # Merkles root simulation (For LITE ONLY)
-        self.lite_block_hash: Optional[str] = None
+        self.lite_block_hash: Optional[str] = lite_block_hash
 
     def clean_transactions(self):
         """
@@ -212,8 +212,6 @@ class Block(Hashable):
 
                 if msg_instance in chat.messages:
                     chat.messages.remove(msg_instance)
-                else:
-                    log.warn('Nop')
 
                 msg_instance.inp = utxo
 

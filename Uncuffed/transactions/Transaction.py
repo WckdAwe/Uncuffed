@@ -81,7 +81,7 @@ class Transaction(Hashable):
             result = True
         except (ValueError, TypeError, Exception) as e:
             result = False
-            log.error(e)
+            log.error(f'Transaction-verify_signature {e}')
         finally:
             self.signature = signature  # Reset signature
             return result

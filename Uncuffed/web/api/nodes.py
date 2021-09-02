@@ -81,7 +81,7 @@ def receive_registration_request():
 				not_registered.append(address)
 		except Exception as e:
 			not_registered.append(address)
-			log.warn(e)
+			log.warn(f'receive_registration_request {e}')
 			continue
 	return json.dumps({
 		'registered': registered,

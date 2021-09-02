@@ -25,5 +25,5 @@ class Storable(JSONSerializable, ABC):
                 json_contents = json.loads(file.read())
                 return cls.from_json(json_contents)
         except Exception as e:
-            log.error(e)
+            log.error(f'Storable-load_from_file {e}')
             return None

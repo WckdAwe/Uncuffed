@@ -28,7 +28,7 @@ class Client(ANode):
         self.my_STXOs: Set[Transactions.TransactionInput] = set()
         self.tmp_msgs: Set[Chats.MessageInstance] = set()
 
-        self.my_UTXOs, self.my_STXOs, self.tmp_msgs = self.load_node()
+        self.my_UTXOs, self.my_STXOs, self.tmp_msgs, self.processed_hashes = self.load_node()
 
         self.refresh_balance()
 
@@ -155,15 +155,17 @@ class Client(ANode):
                 my_UTXOs = set(map(Transactions.TransactionInput.from_json, json_contents['my_UTXOs']))
                 my_STXOs = set(map(Transactions.TransactionInput.from_json, json_contents['my_STXOs']))
                 tmp_msgs = set(map(Chats.MessageInstance.from_json, json_contents['tmp_msgs']))
-                return my_UTXOs, my_STXOs, tmp_msgs
+                processed_hashes = list(json_contents['processed_hashes'])
+                return my_UTXOs, my_STXOs, tmp_msgs, processed_hashes
         except Exception as e:
-            log.error(e)
+            log.error(f'Client-load_node {e}')
             self.store_transactions()
-            return set(), set(), set()
+            return set(), set(), set(), list()
 
     def to_dict(self) -> dict:
         return collections.OrderedDict({
             'my_UTXOs': tuple(map(lambda o: o.to_dict(), self.my_UTXOs)),
             'my_STXOs': tuple(map(lambda o: o.to_dict(), self.my_STXOs)),
-            'tmp_msgs': tuple(map(lambda o: o.to_dict(), self.tmp_msgs))
+            'tmp_msgs': tuple(map(lambda o: o.to_dict(), self.tmp_msgs)),
+            'processed_hashes': tuple(self.processed_hashes)
         })

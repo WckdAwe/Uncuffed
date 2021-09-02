@@ -41,7 +41,7 @@ class TransactionInput(Hashable):
             transaction = block.transactions[self.transaction_index]
             return transaction.outputs[self.output_index]
         except Exception as e:
-            log.error(e)
+            log.error(f'find_transaction {e}')
             return None
 
     def is_valid(self, sender: str, blockchain: 'Blockchain') -> bool:

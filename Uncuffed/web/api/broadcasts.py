@@ -1,3 +1,4 @@
+import copy
 import json
 import Uncuffed.transactions as Transactions
 import Uncuffed.chain as Chain
@@ -70,7 +71,7 @@ def broadcasts_new_block():
 			for trans in block.transactions:
 				my_node.verified_transactions.pop(trans.hash, None)
 		# ---------------------------------------
-		n_handler.broadcast_block(block)
+		n_handler.broadcast_block(copy.deepcopy(block))
 
 		if isinstance(my_node, Nodes.Client):
 			my_node.blockchain.blocks[block.height].clean_transactions()
@@ -179,12 +180,12 @@ def broadcasts_new_transaction():
 		success = my_node.add_transaction(transaction)
 		if success:
 			log.debug(f'[TRANSACTION - {transaction.hash}] Validated')
-			n_handler.broadcast_transaction(transaction)
+			n_handler.broadcast_transaction(copy.deepcopy(transaction))
 		else:
 			log.debug(f'[TRANSACTION - {transaction.hash}] Rejected (INVALID or EXISTS)')
 	elif isinstance(my_node, Nodes.Client):
 		log.debug(f'[TRANSACTION - {transaction.hash}] ECHOING')
-		n_handler.broadcast_transaction(transaction)
+		n_handler.broadcast_transaction(copy.deepcopy(transaction))
 
 	return json.dumps({
 		'message': 'ok',
