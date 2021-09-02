@@ -7,7 +7,7 @@ from typing import List, Set
 
 from .Block import Block
 from ..helpers.Storable import Storable
-from ..helpers.paths import PATH_DATA
+from ..helpers.paths import FILE_BLOCKCHAIN
 
 
 class Blockchain(Storable):
@@ -23,7 +23,7 @@ class Blockchain(Storable):
 
     @staticmethod
     def get_storage_location() -> str:
-        return f'{PATH_DATA}/blockchain.json'
+        return FILE_BLOCKCHAIN
 
     @property
     def last_block(self) -> Block:

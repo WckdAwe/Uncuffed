@@ -3,7 +3,7 @@ import Uncuffed.messages as Messages
 
 from flask import render_template, redirect, request, url_for
 from Uncuffed import app
-
+from Uncuffed.chats.Chat import Chat, get_all_chats
 from ..decorators import requires_auth, requires_unauth
 
 
@@ -19,7 +19,8 @@ def index():
 	return render_template(
 		'index.html',
 		page_title='&bull; Home',
-		user=my_node
+		user=my_node,
+		chats=get_all_chats().values()
 	)
 
 
@@ -71,9 +72,20 @@ def chat(address: str):
 			total_gas=int(request.form.get('blabber_gas')) or 0
 		)
 
+	# Bad way..
+	chats = get_all_chats()
+	my_chat = None
+	if address in chats.keys():
+		my_chat = chats[address]
+	else:
+		my_chat = Chat.load_from_file(
+			friendly_name=address,
+		)
+
 	return render_template(
 		'chat.html',
 		page_title='&bull; Chat',
 		user=my_node,
 		other=address,
+		chat=my_chat
 	)

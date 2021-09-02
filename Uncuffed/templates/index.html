@@ -53,14 +53,21 @@
                     </div>
                 </form>
             </div>
-            <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-                <div class="d-flex gap-2 w-100 justify-content-between">
-                    <div>
-                        <h6 class="mb-0">Another title here</h6>
+            {% for chat in chats %}
+                <a href="chat/{{chat.other_address}}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                    <div class="d-flex gap-2 w-100 justify-content-between">
+                        <div>
+                            <h6 class="mb-0">{{ chat.friendly_name }}</h6>
+                        </div>
                     </div>
-                    <small class="opacity-50 text-nowrap">1s</small>
+                </a>
+            {% else %}
+                <div class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                    <p class="mb-0 opacity-75">
+                        Sooner or later you will talk to someone. You have friends, right? ༼ つ ಥ_ಥ ༽つ
+                    </p>
                 </div>
-            </a>
+            {% endfor %}
         </div>
     </div>
 </div>

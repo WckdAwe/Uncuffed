@@ -3,7 +3,7 @@ import time
 import Uncuffed.transactions as Transactions
 
 from Crypto.Hash import SHA256
-from typing import List, TYPE_CHECKING, Tuple
+from typing import List, TYPE_CHECKING, Tuple, Set, Optional
 from Uncuffed import log
 
 from .Proofer import verify_proof
@@ -25,12 +25,16 @@ class Block(Hashable):
 
     def __init__(self, height, proof=None, transactions=None,
                  previous_block_hash=None,
-                 timestamp=None):
+                 timestamp=None,
+                 lite_block_hash=None):
         self.height: int = height
         self.proof: int = proof
         self.transactions: List[Transactions.Transaction] = transactions or []
         self.previous_block_hash: str = previous_block_hash
         self.timestamp: float = timestamp or time.time()
+
+        # Merkles root simulation (For LITE ONLY)
+        self.lite_block_hash: Optional[str] = None
 
     def clean_transactions(self):
         """
@@ -38,6 +42,7 @@ class Block(Hashable):
         Clean transactions in order to save space in lite clients.
         :return:
         """
+        self.lite_block_hash = self.hash
         self.transactions = []
 
     def is_valid(self, prev_block,
@@ -54,8 +59,11 @@ class Block(Hashable):
         elif self.height != prev_block.height + 1:
             log.debug(f'[BLOCK - {self.height}] Verification Failure (BLOCK ORDER)')
             return False
-        elif self.previous_block_hash != prev_block.hash:
+        elif not lite and self.previous_block_hash != prev_block.hash:
             log.debug(f'[BLOCK - {self.height}] Verification Failure (HASH)')
+            return False
+        elif lite and self.previous_block_hash != prev_block.lite_block_hash:
+            log.debug(f'[BLOCK - {self.height}] Verification Failure (HASH-LITE)')
             return False
         elif len(self.transactions) == 0:   # TODO CHECK(and self.height != 0):
             log.debug(f'[BLOCK - {self.height}] Verification Failure (NO VERIFIED TRANSACTIONS)')
@@ -120,7 +128,7 @@ class Block(Hashable):
                 resp.add(inp)
         return resp
 
-    def find_UTXOs(self, address: str) -> set:
+    def find_UTXOs(self, address: str) -> Set[Transactions.TransactionInput]:
         """
         :param address: Receiving address
         :return: A set of all UTXOs the address received in this block
@@ -153,6 +161,41 @@ class Block(Hashable):
                 resp.add(inp)
         return resp
 
+    def update_chat(self, address: str):
+        """
+        :param address: Receiving address
+        :return:
+        """
+        from Uncuffed.chats.Chat import Chat, get_all_chats
+        from Uncuffed.chats.MessageInstance import MessageInstance
+        chats = get_all_chats()
+
+        for t_indx, transaction in enumerate(self.transactions):
+            outputs: Tuple[Transactions.TransactionOutput] = transaction.outputs
+            if transaction.sender == address:
+                continue
+
+            for o_indx, output in enumerate(outputs):
+                if output.recipient_address == address:
+                    utxo: Transactions.TransactionInput = Transactions.TransactionInput(
+                        block_index=self.height,
+                        transaction_index=t_indx,
+                        output_index=o_indx
+                    )
+                    chat = chats[transaction.sender] if transaction.sender in chats.keys() else Chat.load_from_file(
+                        friendly_name=transaction.sender,
+                    )
+                    msg_instance = MessageInstance(
+                        sender=transaction.sender,
+                        inp=utxo,
+                        message=output.message,
+                        value=output.value,
+                        timestamp=transaction.timestamp,
+                    )
+                    msg_instance.init_message()
+                    chat.messages.append(msg_instance)
+                    chat.store_to_file()
+
     @property
     def hash(self) -> str:
         return SHA256.new(self.to_json()).hexdigest()
@@ -173,23 +216,32 @@ class Block(Hashable):
         transactions = list(map(Transactions.Transaction.from_json, data['transactions']))
         previous_block_hash = str(data['previous_hash'])
         timestamp = float(data['timestamp'])
+        lite_block_hash = data['lite_block_hash'] if 'lite_block_hash' in data else None
 
         return cls(
             height=height,
             proof=proof,
             transactions=transactions,
             previous_block_hash=previous_block_hash,
-            timestamp=timestamp
+            timestamp=timestamp,
+            lite_block_hash=lite_block_hash,
         )
 
     def to_dict(self) -> dict:
-        return collections.OrderedDict({
+        res = collections.OrderedDict({
             'height': self.height,
             'proof': self.proof,
             'transactions': list(map(lambda o: o.to_dict(), self.transactions)),
             'previous_hash': self.previous_block_hash,
             'timestamp': self.timestamp
         })
+
+        if self.lite_block_hash:
+            res.update({
+                'lite_block_hash': self.lite_block_hash
+            })
+
+        return res
 
     def __hash__(self):
         return hash((self.proof, self.transactions, self.previous_block_hash, self.timestamp,))

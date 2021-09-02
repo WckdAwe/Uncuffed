@@ -19,21 +19,35 @@
 					</div>
 					<div class="opacity-50 text-end"><small>(Available Blabbers: <i class="fab fa-connectdevelop"></i> {{ user.balance }})</small></div>
 				</div>
-				<a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-					<div class="d-flex gap-2 w-100 justify-content-between">
-						<div>
+
+				{% for msg_inst in chat.messages|filter_sorted(reverse=true) %}
+				<div class="list-group-item list-group-item-action justify-content-between w-100 d-flex gap-3 py-3" aria-current="true">
+					<div>
+						{% if msg_inst.sender == user.identity %}
+							<h6 class="mb-1">You</h6>
+						{% else %}
 							<h6 class="mb-1">Other guy</h6>
+						{% endif %}
+						{% if msg_inst.message.message_type == 1 %}
+							<p class="mb-0 opacity-75">
+								{{ msg_inst.message.message }} {# ??!?! Good job Vasil! #}
+							</p>
+						{% else %}
 							<small>
-								Hey there what are you doing you weirdo!!
-								Hey there what are you doing you weirdo!!
-								Hey there what are you doing you weirdo!!
-								Hey there what are you doing you weirdo!!
-								Hey there what are you doing you weirdo!!
+								{{ msg_inst.message.message_type }}
 							</small>
-						</div>
-						<small class="opacity-50 text-nowrap">1s</small>
+						{% endif %}
 					</div>
-				</a>
+					<small class="opacity-50 text-nowrap pull-right">{{ msg_inst.timestamp|pretty_date }}</small>
+                </div>
+				{% else %}
+				<div class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                    <p class="mb-0 opacity-75">
+                        Beginning a conversation is simpler than you think... Why don't you just start with a
+						"<strong>hi!</strong>"? (☞ﾟ∀ﾟ)☞
+                    </p>
+                </div>
+				{% endfor %}
 			</div>
 		</div>
 	</div>

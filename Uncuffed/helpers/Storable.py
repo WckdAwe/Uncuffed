@@ -12,16 +12,16 @@ class Storable(JSONSerializable, ABC):
     def get_storage_location() -> str:
         pass
 
-    def store_to_file(self):
-        file_name = self.get_storage_location()
+    def store_to_file(self, storage_location: str = None):
+        file_name = storage_location or self.get_storage_location()
         os.makedirs(os.path.dirname(file_name), exist_ok=True)
         with open(file_name, 'w+') as file:
             file.write(self.to_json().decode('ascii'))
 
     @classmethod
-    def load_from_file(cls):
+    def load_from_file(cls, storage_location: str = None):
         try:
-            with open(cls.get_storage_location(), 'r') as file:
+            with open(storage_location or cls.get_storage_location(), 'r') as file:
                 json_contents = json.loads(file.read())
                 return cls.from_json(json_contents)
         except Exception as e:

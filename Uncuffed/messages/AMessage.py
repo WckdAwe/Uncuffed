@@ -6,7 +6,7 @@ from ..helpers import JSONSerializable
 
 
 class EMessageType(int, Enum):
-    UNDEFINED: int = 0
+    FUND_TRANSFER: int = 0
     PLAINTEXT: int = 1
     ENCRYPTED_TEXT: int = 2
     PLAIN_IMAGE: int = 3
@@ -16,16 +16,14 @@ class AMessage(JSONSerializable, ABC):
 
     @property
     def message_type(self) -> int:
-        return EMessageType.UNDEFINED
+        return EMessageType.FUND_TRANSFER
 
-    @abstractmethod
     def to_dict(self) -> dict:
         return collections.OrderedDict({
             'type': self.message_type,
         })
 
     @classmethod
-    @abstractmethod
     def from_json(cls, data):
         from .PlainTextMessage import TextMessage
 

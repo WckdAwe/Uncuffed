@@ -34,6 +34,10 @@ class Miner(Client):
     def node_type(self) -> int:
         return ENodeType.MINER
 
+    def refresh_balance(self):
+        for my_utxo in self.my_UTXOs:
+            my_utxo.get_balance(blockchain=self.blockchain)
+
     def _construct_genesis_block(self):
         self.construct_block(
             proof=42,
@@ -91,8 +95,15 @@ class Miner(Client):
             my_utxo.get_balance(blockchain=self.blockchain)
             # my_utxo.is_valid(sender=None, blockchain=self.blockchain)
         self.my_UTXOs = self.my_UTXOs.union(my_utxos)
+        self.store_transactions()
         # ---------------------
 
+        self.blockchain.store_to_file()  # STORE BLOCKCHAIN TO FILE
+
+        # -- UPDATE MY CHAT --
+        # -- Yes, it should be implemented a different way... but it is just a demo --
+        # -- We are repeating unnecessary calculations
+        block.update_chat(self.identity)
         return block
 
     @property
