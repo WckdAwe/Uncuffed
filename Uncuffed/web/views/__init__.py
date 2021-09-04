@@ -1,3 +1,5 @@
+from typing import Optional
+
 import Uncuffed.nodes as Nodes
 import Uncuffed.messages as Messages
 
@@ -64,17 +66,41 @@ def chat(address: str):
 		return redirect(url_for('index'))
 
 	if request.method == 'POST':
-		my_node.send_message(
-			address=address,
-			message=Messages.PlainTextMessage(
-				message=request.form.get('text_message') or None
-			),
-			total_gas=int(request.form.get('blabber_gas')) or 0
-		)
+		# -1: FUND TRANSFER, 0: PLAIN, 1: ENCRYPTED
+		msg_type = int(request.form.get('msg_type'))
+		file_img = request.files['file_img']
+		text_message = request.form.get('text_message')
+		message: Optional[Messages.AMessage] = None
+
+		if file_img.filename == '' and text_message == '' and msg_type != -1:
+			pass
+		elif file_img.filename != '':
+			if msg_type == 0:
+				pass
+			elif msg_type == 1:
+				pass
+		elif text_message != '':
+			if msg_type == 0:
+				message = Messages.PlainTextMessage(
+					message=request.form.get('text_message') or ''
+				)
+			elif msg_type == 1:
+				message = Messages.EncryptedTextMessage(
+					message=request.form.get('text_message') or ''
+				)
+		elif msg_type == -1:
+			pass
+		if message:
+			my_node.send_message(
+				address=address,
+				message=message,
+				total_gas=int(request.form.get('blabber_gas')) or 0
+			)
 
 	# Bad way..
 	chats = get_all_chats()
 	my_chat = None
+
 	if address in chats.keys():
 		my_chat = chats[address]
 	else:

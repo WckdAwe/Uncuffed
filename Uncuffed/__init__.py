@@ -2,6 +2,7 @@ import Uncuffed.helpers.logger
 
 from flask import Flask
 from typing import TYPE_CHECKING, Optional
+from .helpers.paths import PATH_UPLOADS
 
 if TYPE_CHECKING:
     from Uncuffed.nodes import ANode
@@ -14,6 +15,12 @@ my_node: Optional['ANode'] = None
 
 # Web App
 app = Flask(__name__)
+# app.config['UPLOAD_FOLDER'] = PATH_UPLOADS
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg'}
 
 
 @app.template_filter()

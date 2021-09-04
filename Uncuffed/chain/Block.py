@@ -1,6 +1,7 @@
 import collections
 import time
 import Uncuffed.transactions as Transactions
+import Uncuffed.messages as Messages
 
 from Crypto.Hash import SHA256
 from typing import List, TYPE_CHECKING, Tuple, Set, Optional
@@ -215,8 +216,19 @@ class Block(Hashable):
 
                 msg_instance.inp = utxo
 
-                msg_instance.init_message()
-                chat.messages.add(msg_instance)
+                if transaction.sender == address and msg_instance.message.message_type not in [
+                    Messages.EMessageType.ENCRYPTED_TEXT,
+                ]:
+                    print('something uncool')
+                    chat.messages.add(msg_instance)
+                elif output.recipient_address == address:
+                    print('something cool is happening')
+                    print(type(msg_instance))
+                    if isinstance(msg_instance.message, Messages.EncryptedTextMessage):
+                        msg_instance.message.decrypt(key=node.private_key)
+                        print('decrypted')
+
+                    chat.messages.add(msg_instance)
                 chat.store_to_file()
 
     @property

@@ -2,13 +2,19 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<div class="row">
+<div class="row" xmlns="http://www.w3.org/1999/html">
 		<div class="col-md-12">
-			<form class="list-group" action="" method="POST">
+			<form class="list-group" action="" method="POST" enctype="multipart/form-data">
 				<div class="list-group-item list-group-item-action gap-3 py-3">
 					<div class="input-group">
-						<input type="text" class="form-control" name="text_message" id="text_message" placeholder="Your message... " value="" required>
-						<button class="input-group-text btn btn-outline-secondary">
+						<input type="text" class="form-control" name="text_message" id="text_message" placeholder="Your message... " value="">
+						<select class="form-select" data-width="fit" name="msg_type" id="msg_type">
+							<option value="1" selected>ENCRYPTED</option>
+							<option value="0">PLAIN</option>
+							<option value="-1"><i class="fab fa-connectdevelop"></i> FUND TRANSFER</option>
+					  	</select>
+						<input type="file" id="file_img" name="file_img" class="input-group-text btn btn-outline-secondary" style="display: none;"  accept="image/png, image/gif, image/jpeg"/>
+						<button class="input-group-text btn btn-outline-secondary" onclick="document.getElementById('file_img').click();">
 							<i class="fas fa-paperclip"></i>
 						</button>
 						<span class="input-group-text">
@@ -28,15 +34,22 @@
 						{% else %}
 							<h6 class="mb-1">Other guy</h6>
 						{% endif %}
-						{% if msg_inst.message.message_type == 1 %}
+						{% if msg_inst.message.message_type in [1, 2] %}
 							<p class="mb-0 opacity-75">
 								{{ msg_inst.message.message }} {# ??!?! Good job Vasil! #}
+							</p>
+						{% elif msg_inst.message.message_type == 3 %}
+							<p class="mb-0 opacity-75">
+								{{ msg_inst.message.message }}
 							</p>
 						{% else %}
 							<small>
 								{{ msg_inst.message.message_type }}
 							</small>
 						{% endif %}
+						<small class="opacity-50 text-nowrap position-absolute bottom-0 end-0 m-2 px-2">
+							 <i class="fab fa-connectdevelop"></i> {{ msg_inst.value }}
+						</small>
 					</div>
 					<small class="opacity-50 text-nowrap pull-right">{{ msg_inst.timestamp|pretty_date }}</small>
                 </div>

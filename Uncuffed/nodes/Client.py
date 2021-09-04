@@ -1,4 +1,5 @@
 import collections
+import copy
 import json
 import operator
 import os
@@ -50,6 +51,12 @@ class Client(ANode):
             Optional[Transactions.Transaction]:
         transaction_outputs: List[Transactions.TransactionOutput] = []
         allocated_balance = 0
+
+        message_clone = copy.copy(message)
+        if isinstance(message, Messages.EncryptedTextMessage):
+            message.encrypt(
+                address=address
+            )
 
         if total_gas < Transactions.TransactionOutput.calculate_minimum_blabbers(message):
             return None
@@ -107,7 +114,7 @@ class Client(ANode):
         self._add_to_chat(
             address=address,
             transaction=transaction,
-            message=message,
+            message=message_clone,
             total_gas=total_gas
         )
         return transaction
@@ -130,7 +137,7 @@ class Client(ANode):
             value=total_gas,
             timestamp=transaction.timestamp,
         )
-        msg_instance.init_message()
+
         chat.messages.add(msg_instance)
         chat.store_to_file()
         return chat, msg_instance

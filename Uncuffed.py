@@ -9,8 +9,24 @@ logging.getLogger().setLevel(logging.DEBUG)
 
 
 def tst_run(port=5000):
-	# Unc.my_node = Nodes.Miner(Nodes.KeyFactory.create_key())
-	# Unc.my_node = Nodes.Miner(Nodes.KeyFactory.create_key())
+	# Unc.my_node = Nodes.Client(Nodes.KeyFactory.load_or_generate_key())
+	#
+	# from Crypto.Cipher import AES, PKCS1_OAEP
+	# import binascii
+	#
+	# public_key = Unc.my_node.identity
+	# from Crypto.PublicKey import RSA
+	# cipher_rsa = PKCS1_OAEP.new(
+	# 	RSA.import_key(binascii.unhexlify(public_key))
+	# )
+	# enc_session_key = cipher_rsa.encrypt('hello!'.encode('utf-8'))
+	#
+	# enc_session_key = binascii.hexlify(enc_session_key).decode('ascii')
+	# print(enc_session_key)
+	# cipher_rsa = PKCS1_OAEP.new(Unc.my_node.private_key)
+	# session_key = cipher_rsa.decrypt(binascii.unhexlify(enc_session_key))
+	# print(str(session_key))
+
 	Network.PeerNetwork.load_from_file()
 	Network.NetworkHandler.get_instance(
 		my_peer=Network.Peer(

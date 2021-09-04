@@ -20,7 +20,7 @@ class MessageInstance(JSONSerializable):
         self.message: Messages.AMessage = Messages.AMessage() if message is None else message
         self.timestamp = timestamp
 
-    def init_message(self) -> Messages.AMessage:
+    def get_message(self, node: Nodes.ANode):
         """
         Called only once, initially, when message is first received
         :param node:
@@ -29,11 +29,12 @@ class MessageInstance(JSONSerializable):
         if self.message.message_type is Messages.EMessageType.FUND_TRANSFER or \
                 self.message.message_type is Messages.EMessageType.PLAINTEXT or \
                 self.message.message_type is Messages.EMessageType.PLAIN_IMAGE:
-            return self.message
+            return
 
         # TODO DECRYPT MESSAGE
-        if self.message.message_type is Messages.EMessageType.ENCRYPTED_TEXT:
-            pass
+        # if isinstance(self.message, Messages.EncryptedTextMessage):
+        # pass
+        # self.message.decrypt(node.private_key)
         #
         # if self.sender == node.identity:    # Decrypt my Message
         #     pass
@@ -43,10 +44,35 @@ class MessageInstance(JSONSerializable):
 
     def __eq__(self, other):
         return self.sender == other.sender and \
-               self.inp == other.inp and \
                self.value == other.value and \
+               self.inp == other.inp and \
                self.timestamp == other.timestamp and \
                self.message == other.message
+        # if self.inp is None or other.inp is None:
+        #     if self.sender != other.sender or \
+        #             self.value != other.value or \
+        #             self.timestamp != other.timestamp:
+        #         return False
+        #
+        #     if type(self.message) != type(other.message):
+        #         return False
+        #
+        #     if self.inp is None:
+        #         local_msg = self
+        #         block_msg = other
+        #     else:
+        #         block_msg = self
+        #         local_msg = other
+        #
+        #     if isinstance(self.message, Messages.EncryptedTextMessage):
+        #         self.message.soft_encrypt( block_msg.inp)
+        #
+        #     return self.sender == other.sender and \
+        #            self.value == other.value and \
+        #            self.timestamp == other.timestamp and \
+        #            self.message == other.message
+        # else:
+        #     return self.inp == other.inp
 
     def __lt__(self, other):
         return self.timestamp < other.timestamp

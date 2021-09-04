@@ -1,5 +1,6 @@
 PATH_DATA = 'data'
 PATH_CHATS = f'{PATH_DATA}/chats'
+PATH_UPLOADS = f'{PATH_DATA}/uploads'
 
 FILE_NODELIST = f'{PATH_DATA}/node_list.json'
 FILE_BLOCKCHAIN = f'{PATH_DATA}/blockchain.json'
