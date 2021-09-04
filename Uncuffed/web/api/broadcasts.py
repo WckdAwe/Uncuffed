@@ -129,7 +129,7 @@ def broadcasts_new_block():
 					# -- UPDATE MY CHAT --
 					# -- Yes, it should be implemented a different way... but it is just a demo --
 					# -- We are repeating unnecessary calculations
-					block.update_chat(my_node)
+					tmp_block.update_chat(my_node)
 				# ---------------------
 
 				my_node.blockchain = chain
@@ -137,8 +137,9 @@ def broadcasts_new_block():
 				my_node.refresh_balance()
 				my_node.store_transactions()
 
-				for block in my_node.blockchain.blocks:
-					block.clean_transactions()
+				if isinstance(my_node, Nodes.Client):
+					for block in my_node.blockchain.blocks:
+						block.clean_transactions()
 
 			else:
 				log.info(f'[BLOCK - {block.height}] Rejected (AHEAD - NO KNOWLEDGE)')

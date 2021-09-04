@@ -16,16 +16,34 @@ def tst_run(port=5000):
 	#
 	# public_key = Unc.my_node.identity
 	# from Crypto.PublicKey import RSA
+	# from Crypto.Random import get_random_bytes
+	#
+	# session_key = get_random_bytes(16)
+	#
 	# cipher_rsa = PKCS1_OAEP.new(
 	# 	RSA.import_key(binascii.unhexlify(public_key))
 	# )
-	# enc_session_key = cipher_rsa.encrypt('hello!'.encode('utf-8'))
+	# enc_session_key = cipher_rsa.encrypt(session_key)
+	# # enc_session_key = binascii.hexlify(enc_session_key).decode('ascii')
 	#
-	# enc_session_key = binascii.hexlify(enc_session_key).decode('ascii')
-	# print(enc_session_key)
+	# cipher_aes = AES.new(session_key, AES.MODE_EAX)
+	# ciphertext, tag = cipher_aes.encrypt_and_digest('hello_msg'.encode('utf-8'))
+	# encoded_text = b''.join([x for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext)])
+	# print(encoded_text)
+	# IO.
+	# enc_session_key, nonce, tag, ciphertext = \
+	# 	[encoded_text. for x in (Unc.my_node.private_key.size_in_bytes(), 16, 16, -1)]
+	#
 	# cipher_rsa = PKCS1_OAEP.new(Unc.my_node.private_key)
-	# session_key = cipher_rsa.decrypt(binascii.unhexlify(enc_session_key))
-	# print(str(session_key))
+	# session_key = cipher_rsa.decrypt(enc_session_key)
+	#
+	# cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
+	# data = cipher_aes.decrypt_and_verify(ciphertext, tag)
+	#
+	# print(data.decode('utf-8'))
+
+
+
 
 	Network.PeerNetwork.load_from_file()
 	Network.NetworkHandler.get_instance(

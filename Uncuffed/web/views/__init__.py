@@ -1,3 +1,4 @@
+import base64
 from typing import Optional
 
 import Uncuffed.nodes as Nodes
@@ -76,9 +77,9 @@ def chat(address: str):
 			pass
 		elif file_img.filename != '':
 			if msg_type == 0:
-				pass
+				message = Messages.ImageMessage.from_file(file=file_img)
 			elif msg_type == 1:
-				pass
+				message = Messages.EncryptedImageMessage.from_file(file=file_img)
 		elif text_message != '':
 			if msg_type == 0:
 				message = Messages.PlainTextMessage(

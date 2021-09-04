@@ -13,10 +13,10 @@
 							<option value="0">PLAIN</option>
 							<option value="-1"><i class="fab fa-connectdevelop"></i> FUND TRANSFER</option>
 					  	</select>
-						<input type="file" id="file_img" name="file_img" class="input-group-text btn btn-outline-secondary" style="display: none;"  accept="image/png, image/gif, image/jpeg"/>
-						<button class="input-group-text btn btn-outline-secondary" onclick="document.getElementById('file_img').click();">
+						<label for="file_img" class="input-group-text btn btn-outline-secondary">
 							<i class="fas fa-paperclip"></i>
-						</button>
+						</label>
+						<input id="file_img" name="file_img" style="display: none;" type="file" accept="image/png, image/gif, image/jpeg"/>
 						<span class="input-group-text">
 							<i class="fab fa-connectdevelop"></i>
 						</span>
@@ -38,9 +38,9 @@
 							<p class="mb-0 opacity-75">
 								{{ msg_inst.message.message }} {# ??!?! Good job Vasil! #}
 							</p>
-						{% elif msg_inst.message.message_type == 3 %}
+						{% elif msg_inst.message.message_type in [3, 4] %}
 							<p class="mb-0 opacity-75">
-								{{ msg_inst.message.message }}
+								<img src="{{ msg_inst.message.get_image_src() }}" />
 							</p>
 						{% else %}
 							<small>

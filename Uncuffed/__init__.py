@@ -1,3 +1,5 @@
+from Crypto.PublicKey.RSA import RsaKey
+
 import Uncuffed.helpers.logger
 
 from flask import Flask
@@ -15,12 +17,38 @@ my_node: Optional['ANode'] = None
 
 # Web App
 app = Flask(__name__)
-# app.config['UPLOAD_FOLDER'] = PATH_UPLOADS
+app.config['UPLOAD_FOLDER'] = PATH_UPLOADS
 
 
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg'}
+
+
+def rsa_long_encrypt(pub_key: bytes, msg: bytes, length=100) -> bytes:
+    "https://titanwolf.org/Network/Articles/Article?AID=7211ded3-94dd-499d-b38b-0974435061ba#gsc.tab=0"
+    from Crypto.PublicKey import RSA
+    from Crypto.Cipher import PKCS1_v1_5
+
+    pubobj = RSA.importKey(pub_key)
+    pubobj = PKCS1_v1_5.new(pubobj)
+    res = []
+    for i in range(0, len(msg), length):
+        res.append(pubobj.encrypt(msg[i:i + length]))
+    return b''.join(res)
+
+
+def rsa_long_decrypt(priv_key: RsaKey, msg: bytes, length=128) -> bytes:
+    "" " 128 for 1024bit certificates and 256 bits for 2048bit certificates" ""
+    from Crypto.PublicKey import RSA
+    from Crypto.Cipher import PKCS1_v1_5
+
+    # privobj = RSA.importKey(priv_key)
+    privobj = PKCS1_v1_5.new(priv_key)
+    res = []
+    for i in range(0, len(msg), length):
+        res.append(privobj.decrypt(msg[i:i + length], b'xyz'))
+    return b''.join(res)
 
 
 @app.template_filter()

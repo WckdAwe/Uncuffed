@@ -53,7 +53,7 @@ class Client(ANode):
         allocated_balance = 0
 
         message_clone = copy.copy(message)
-        if isinstance(message, Messages.EncryptedTextMessage):
+        if isinstance(message, (Messages.EncryptedTextMessage, Messages.EncryptedImageMessage)):
             message.encrypt(
                 address=address
             )

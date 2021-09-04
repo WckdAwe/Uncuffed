@@ -1,4 +1,5 @@
 import collections
+import copy
 import time
 import Uncuffed.transactions as Transactions
 import Uncuffed.messages as Messages
@@ -175,8 +176,6 @@ class Block(Hashable):
 
         for t_indx, transaction in enumerate(self.transactions):
             outputs: Tuple[Transactions.TransactionOutput] = transaction.outputs
-            # if transaction.sender == address:
-            #     continue
 
             for o_indx, output in enumerate(outputs):
                 if transaction.sender != address and output.recipient_address != address:
@@ -206,7 +205,7 @@ class Block(Hashable):
                 msg_instance = MessageInstance(
                     sender=transaction.sender,
                     inp=None,
-                    message=output.message,
+                    message=copy.copy(output.message),
                     value=output.value,
                     timestamp=transaction.timestamp,
                 )
@@ -218,15 +217,13 @@ class Block(Hashable):
 
                 if transaction.sender == address and msg_instance.message.message_type not in [
                     Messages.EMessageType.ENCRYPTED_TEXT,
+                    Messages.EMessageType.ENCRYPTED_IMAGE
                 ]:
-                    print('something uncool')
                     chat.messages.add(msg_instance)
                 elif output.recipient_address == address:
-                    print('something cool is happening')
-                    print(type(msg_instance))
-                    if isinstance(msg_instance.message, Messages.EncryptedTextMessage):
+                    if isinstance(msg_instance.message,
+                                  (Messages.EncryptedTextMessage, Messages.EncryptedImageMessage)):
                         msg_instance.message.decrypt(key=node.private_key)
-                        print('decrypted')
 
                     chat.messages.add(msg_instance)
                 chat.store_to_file()
