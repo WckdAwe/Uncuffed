@@ -226,6 +226,8 @@ the case for Uncuffed, but with the additional payload of `PLAINTEXT` or `ENCRYP
 Similarly to a block, each transaction is __uniquely identifiable by its hash__. This hash is
 generated using the transactions contents, such as the sender, receiver, value and timestamp.
 
+<br />
+<br />
 
 ### UTXOs (Unspent Transaction Outputs)
 
