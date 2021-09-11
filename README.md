@@ -27,10 +27,22 @@
 
 
 <!-- TABLE OF CONTENTS -->
-- [Table of Contents](#table-of-contents)
+## Table of Contents
 - [About The Project](#about-the-project)
-  - [Built with](#built-with)
 - [Getting Started](#getting-started)
+- [How Does It Work](#how-does-it-work)
+  - [What is a Blockchain](#what-is-a-blockchain)
+  - [Uncuffed users](#uncuffed-users)
+  - [Block Structure](#block-structure)
+  - [Proof-of-Work Algorithm](#proof-of-work-algorithm)
+  - [Transactions](#transactions)
+  - [UTXOs (Unspent Transaction Outputs)](#utxos-unspent-transaction-outputs)
+    - [UTXO Example](#utxo-example)
+  - [Validation](#validation)
+  - [Message Payload](#message-payload)
+  - [Peer Network (API)](#peer-network-api)
+  - [Web Interface Routes](#web-interface-routes)
+  - [Storage Data Routes](#storage-data-routes)
 - [License](#license)
 - [Authors](#authors)
 - [Disclaimer](#disclaimer)
@@ -110,7 +122,7 @@ A blockchain is a list of a continuously ever-growing list of blocks,
 which are linked together using a __cryptographic hash__.
 
 <p align="center">
-  <img src="/_github_images/2_blockchain_linked.gif">
+  <img src="/_github_images/2_blockchain_linked.jpg">
 </p>
 
 Each block contains a set of publicly viewable transactions which are stored permanently
