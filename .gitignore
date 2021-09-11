@@ -122,3 +122,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+
+# CUSTOM
+/data/chats/*
+/data/uploads/*
+/data/blockchain.json
+/data/node.json
+/data/wallet.der
+file.log
+/.idea/*
