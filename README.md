@@ -439,7 +439,7 @@ availability or completeness of any information.
 [contributors-shield]: https://img.shields.io/github/contributors/WckdAwe/Uncuffed.svg?style=for-the-badge
 [contributors-url]: https://github.com/WckdAwe/Uncuffed.svg/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/WckdAwe/Uncuffed.svg?style=for-the-badge
-[forks-url]: https://github.com/othneildrew/PlebeianDev/WckdAwe/Uncuffed/network/members
+[forks-url]: https://github.com/WckdAwe/Uncuffed/network/members
 [stars-shield]: https://img.shields.io/github/stars/WckdAwe/Uncuffed.svg?style=for-the-badge
 [stars-url]: https://github.com/WckdAwe/Uncuffed/stargazers
 [issues-shield]: https://img.shields.io/github/issues/WckdAwe/Uncuffed.svg?style=for-the-badge
