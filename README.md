@@ -5,7 +5,10 @@
 [![MIT License][license-shield]][license-url]
 
 
-![](_github_images/demo.gif)
+<p align="center">
+  <img src="/_github_images/demo.gif">
+</p>
+
 <br />
 <p align="center">
   <h3 align="center">:link: Uncuffed - Blockchain secure messaging</h3>
@@ -99,12 +102,16 @@ projects work, and then seeing what we do slightly different.
 
 ### What is a Blockchain
 
-![](_github_images/1_blockchain_growing.gif)
+<p align="center">
+  <img width="400" src="/_github_images/1_blockchain_growing.gif">
+</p>
 
 A blockchain is a list of a continuously ever-growing list of blocks,
 which are linked together using a __cryptographic hash__.
 
-![](_github_images/2_blockchain_linked.jpg)
+<p align="center">
+  <img src="/_github_images/2_blockchain_linked.gif">
+</p>
 
 Each block contains a set of publicly viewable transactions which are stored permanently
 on the blockchain. Additionally, each block may also include some meta-data required for the
@@ -135,7 +142,7 @@ to the blockchain__. Miners can be considered the labor-force of the network.
 
 ### Block Structure
 
-<img align="left" src="_github_images/3_Block_Structure.jpg">
+<img width="200" align="left" src="_github_images/3_Block_Structure.jpg">
 
 The image contains a simplified and easier to understand block structure. The following characteristics remain
 the same between different blockchain projects.
@@ -199,7 +206,7 @@ user's chat faster.
 
 ### Transactions
 
-<img align="left" src="_github_images/5_random-transactions.jpg">
+<img width="200" align="left" src="_github_images/5_random_transactions.jpg">
 
 Usually, transactions signal the transfer of wealth from a user to another. This remains
 the case for Uncuffed, but with the additional payload of `PLAINTEXT` or `ENCRYPTED` messages.
